@@ -9,10 +9,6 @@ const session = require("express-session");
 
 const app = express();
 
-let indexRouter = require("./routes/index");
-let authRouter = require("./routes/auth");
-app.locals.pluralize = require("pluralize");
-
 console.log("🚀 Starting Express application...");
 
 // view engine setup
@@ -23,7 +19,12 @@ app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-
+app.get("/", (req, res) => {
+  res.render("index");
+});
+app.get("/register", (req, res) => {
+  res.render("register");
+});
 app.listen(3000, () => {
   console.log("Server Started on Port 3000");
 });

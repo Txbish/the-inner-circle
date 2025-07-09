@@ -1,0 +1,75 @@
+<%- include('partials/header', { title: 'Home - Members Only' }) %>
+
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card shadow-lg border-0">
+      <div class="card-body p-5">
+        <div class="text-center mb-4">
+          <i class="fas fa-shield-alt fa-3x text-primary mb-3"></i>
+          <h1 class="display-4 fw-bold text-dark">Welcome to Members Only</h1>
+          <p class="lead text-muted">
+            A secure and exclusive community platform
+          </p>
+        </div>
+
+        <div class="row mt-5">
+          <div class="col-md-4 text-center mb-4">
+            <div class="feature-box p-3">
+              <i class="fas fa-lock fa-2x text-primary mb-3"></i>
+              <h5>Secure</h5>
+              <p class="text-muted">
+                Your data is protected with industry-standard security measures.
+              </p>
+            </div>
+          </div>
+          <div class="col-md-4 text-center mb-4">
+            <div class="feature-box p-3">
+              <i class="fas fa-users fa-2x text-primary mb-3"></i>
+              <h5>Exclusive</h5>
+              <p class="text-muted">
+                Join a select community of verified members.
+              </p>
+            </div>
+          </div>
+          <div class="col-md-4 text-center mb-4">
+            <div class="feature-box p-3">
+              <i class="fas fa-comments fa-2x text-primary mb-3"></i>
+              <h5>Connect</h5>
+              <p class="text-muted">
+                Engage in meaningful conversations with fellow members.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-center mt-5">
+          <h3 class="mb-3">Ready to join?</h3>
+          <div class="d-grid gap-2 d-md-block">
+            <a href="/register" class="btn btn-primary btn-lg me-2">
+              <i class="fas fa-user-plus"></i> Sign Up
+            </a>
+            <a href="/login" class="btn btn-outline-primary btn-lg">
+              <i class="fas fa-sign-in-alt"></i> Login
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row mt-5">
+  <div class="col-12">
+    <div class="alert alert-info" role="alert">
+      <h4 class="alert-heading">
+        <i class="fas fa-info-circle"></i> Testing Information
+      </h4>
+      <p class="mb-0">
+        This is a test home page for the Members Only application. The server is
+        running on port 3000.
+      </p>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>
