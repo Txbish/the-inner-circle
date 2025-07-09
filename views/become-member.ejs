@@ -20,8 +20,28 @@
         <div class="alert alert-success" role="alert">
           <i class="fas fa-check-circle me-2"></i><%= success %>
         </div>
-        <% } %>
+        <% } %> <% if (typeof user !== 'undefined' && user.is_member) { %>
+        <!-- User is already a member -->
+        <div class="text-center">
+          <div class="mb-4">
+            <i class="fas fa-check-circle fa-4x text-success mb-3"></i>
+            <h3 class="text-success">You're Already a Member!</h3>
+            <p class="text-muted">
+              You have full access to all member privileges.
+            </p>
+          </div>
 
+          <div class="d-grid gap-2 d-md-block">
+            <a href="/" class="btn btn-primary btn-lg">
+              <i class="fas fa-home me-2"></i>Go to Home
+            </a>
+            <a href="/member-area" class="btn btn-outline-primary btn-lg">
+              <i class="fas fa-users me-2"></i>Member Area
+            </a>
+          </div>
+        </div>
+        <% } else { %>
+        <!-- User is not a member, show the form -->
         <form action="/auth/become-member" method="post">
           <div class="mb-4">
             <label for="passcode" class="form-label">Secret Passcode</label>
@@ -58,6 +78,7 @@
             </a>
           </div>
         </form>
+        <% } %>
       </div>
     </div>
   </div>

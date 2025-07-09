@@ -198,7 +198,7 @@ router.post(
       .isLength({ min: 1 })
       .withMessage("Passcode can't be empty")
       .custom((value) => {
-        if (value !== process.env.MEMBER_PASSCODE) {
+        if (value !== process.env.MEMBER_CODE) {
           throw new Error("Invalid passcode");
         }
         return true;
@@ -256,5 +256,20 @@ router.post(
     }
   }
 );
+
+router.post("/logout", (req, res, next) => {
+  req.logout((err) => {
+    if (err) {
+      return next(err);
+    }
+    req.session.destroy((err) => {
+      if (err) {
+        return next(err);
+      }
+      res.clearCookie("members_only_session");
+      res.redirect("/");
+    });
+  });
+});
 
 module.exports = router;

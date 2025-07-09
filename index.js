@@ -6,6 +6,8 @@ const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const passport = require("passport");
 const session = require("express-session");
+const pgSession = require("connect-pg-simple")(session);
+const pool = require("./db");
 
 const authRoutes = require("./routes/auth");
 const app = express();
@@ -23,9 +25,22 @@ app.use(cookieParser());
 
 app.use(
   session({
+    store: new pgSession({
+      pool: pool, // Connection pool
+      tableName: "user_sessions", // Table name for sessions
+      createTableIfMissing: true, // Create table if it doesn't exist
+    }),
+    name: "members_only_session", // Session name
     secret: process.env.SESSION_SECRET || "cats",
     resave: false,
     saveUninitialized: false,
+    rolling: true, // Reset expiry on activity
+    cookie: {
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      secure: false, // Set to true in production with HTTPS
+      httpOnly: true, // Prevent XSS attacks
+      sameSite: "lax", // CSRF protection
+    },
   })
 );
 

@@ -11,6 +11,7 @@
   "description": "",
   "dependencies": {
     "bcryptjs": "^3.0.2",
+    "connect-pg-simple": "^10.0.0",
     "cookie-parser": "^1.4.7",
     "dotenv": "^17.1.0",
     "ejs": "^3.1.10",
