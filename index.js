@@ -8,7 +8,6 @@ const passport = require("passport");
 const session = require("express-session");
 
 const authRoutes = require("./routes/auth");
-
 const app = express();
 
 console.log("🚀 Starting Express application...");
@@ -40,7 +39,6 @@ function ensureLoggedIn(req, res, next) {
 
 // Routes
 app.use("/auth", authRoutes);
-
 app.get("/become-member", ensureLoggedIn, (req, res) => {
   res.render("become-member", { user: req.user });
 });

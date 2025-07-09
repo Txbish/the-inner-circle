@@ -41,25 +41,48 @@ passport.use(
   })
 );
 
-router.post("/login", (req, res, next) => {
-  passport.authenticate("local", (err, user, info) => {
-    if (err) {
-      return next(err);
-    }
-    if (!user) {
+router.post(
+  "/login",
+  [
+    body("username")
+      .trim()
+      .isLength({ min: 1 })
+      .withMessage("Username or email is required")
+      .escape(),
+
+    body("password").isLength({ min: 1 }).withMessage("Password is required"),
+  ],
+  (req, res, next) => {
+    // Check for validation errors first
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      const errorMessages = errors.array().map((error) => error.msg);
       return res.render("login", {
-        error: info.message,
+        error: errorMessages.join(". "),
         formData: req.body,
       });
     }
-    req.logIn(user, (err) => {
+
+    // Proceed with passport authentication if validation passes
+    passport.authenticate("local", (err, user, info) => {
       if (err) {
         return next(err);
       }
-      return res.redirect("/");
-    });
-  })(req, res, next);
-});
+      if (!user) {
+        return res.render("login", {
+          error: info.message,
+          formData: req.body,
+        });
+      }
+      req.logIn(user, (err) => {
+        if (err) {
+          return next(err);
+        }
+        return res.redirect("/");
+      });
+    })(req, res, next);
+  }
+);
 
 router.post(
   "/register",
@@ -149,7 +172,6 @@ router.post(
       const saltRounds = 10;
       const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-      // Determine if user is admin
       const isAdmin = admin === "admin";
 
       const newUser = await pool.query(
@@ -163,6 +185,73 @@ router.post(
       res.render("register", {
         error: "An error occurred during registration. Please try again.",
         formData: req.body,
+      });
+    }
+  }
+);
+
+router.post(
+  "/become-member",
+  [
+    body("passcode")
+      .trim()
+      .isLength({ min: 1 })
+      .withMessage("Passcode can't be empty")
+      .custom((value) => {
+        if (value !== process.env.MEMBER_PASSCODE) {
+          throw new Error("Invalid passcode");
+        }
+        return true;
+      }),
+  ],
+  async (req, res) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).render("login", {
+          error: "Please log in to become a member",
+        });
+      }
+
+      // Handle validation errors
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.render("become-member", {
+          error: errors.array()[0].msg,
+          formData: req.body,
+          user: req.user,
+        });
+      }
+
+      if (req.user.is_member) {
+        return res.render("become-member", {
+          success: "You are already a member!",
+          user: req.user,
+        });
+      }
+
+      // Update membership status
+      const { rowCount } = await pool.query(
+        "UPDATE users SET is_member = true WHERE id = $1",
+        [req.user.id]
+      );
+
+      if (rowCount === 0) {
+        throw new Error("User not found or could not update");
+      }
+
+      // Update the user object for the session
+      req.user.is_member = true;
+
+      res.render("become-member", {
+        success: "Congratulations! You are now a member!",
+        user: req.user,
+      });
+    } catch (error) {
+      console.error("Error changing membership status:", error);
+      res.status(500).render("become-member", {
+        error: "An error occurred. Please try again.",
+        formData: req.body,
+        user: req.user,
       });
     }
   }
