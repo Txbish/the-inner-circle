@@ -1,0 +1,103 @@
+<%- include('partials/header', { title: 'Become a Member - Members Only' }) %>
+
+<div class="row justify-content-center">
+  <div class="col-lg-6 col-md-8">
+    <div class="card shadow-lg border-0">
+      <div class="card-body p-5">
+        <div class="text-center mb-4">
+          <i class="fas fa-star fa-3x text-warning mb-3"></i>
+          <h2 class="fw-bold text-dark">Become a Member</h2>
+          <p class="text-muted">
+            Enter the secret passcode to unlock member privileges
+          </p>
+        </div>
+
+        <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-danger" role="alert">
+          <i class="fas fa-exclamation-triangle me-2"></i><%= error %>
+        </div>
+        <% } %> <% if (typeof success !== 'undefined' && success) { %>
+        <div class="alert alert-success" role="alert">
+          <i class="fas fa-check-circle me-2"></i><%= success %>
+        </div>
+        <% } %>
+
+        <form action="/become-member" method="post">
+          <div class="mb-4">
+            <label for="passcode" class="form-label">Secret Passcode</label>
+            <div class="input-group">
+              <span class="input-group-text">
+                <i class="fas fa-key"></i>
+              </span>
+              <input
+                name="passcode"
+                id="passcode"
+                type="password"
+                class="form-control"
+                placeholder="Enter the secret passcode"
+                value="<%= typeof formData !== 'undefined' && formData.passcode ? formData.passcode : '' %>"
+                required
+              />
+            </div>
+            <div class="form-text text-muted">
+              <small
+                >Contact an existing member to get the secret passcode.</small
+              >
+            </div>
+          </div>
+
+          <div class="d-grid mb-3">
+            <button type="submit" class="btn btn-warning btn-lg">
+              <i class="fas fa-star me-2"></i>Become a Member
+            </button>
+          </div>
+
+          <div class="text-center">
+            <a href="/" class="text-decoration-none">
+              <i class="fas fa-arrow-left me-1"></i>Back to Home
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row mt-4">
+  <div class="col-12">
+    <div class="card bg-light">
+      <div class="card-body">
+        <h5 class="card-title">
+          <i class="fas fa-info-circle text-primary me-2"></i>Member Benefits
+        </h5>
+        <div class="row">
+          <div class="col-md-4">
+            <div class="text-center p-3">
+              <i class="fas fa-eye fa-2x text-primary mb-2"></i>
+              <h6>Access Secret Posts</h6>
+              <p class="small text-muted">View exclusive member-only content</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="text-center p-3">
+              <i class="fas fa-comments fa-2x text-primary mb-2"></i>
+              <h6>Join Discussions</h6>
+              <p class="small text-muted">
+                Participate in member conversations
+              </p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="text-center p-3">
+              <i class="fas fa-crown fa-2x text-warning mb-2"></i>
+              <h6>Exclusive Access</h6>
+              <p class="small text-muted">Special privileges and features</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>
