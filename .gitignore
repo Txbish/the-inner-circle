@@ -1,0 +1,43 @@
+# Node
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+.env
+.DS_Store
+*.local
+*.env.*
+# VSCode
+.vscode/
+# OS
+Thumbs.db
+.DS_Store
+# Logs
+logs
+*.log
+*.csv
+*.dat
+*.out
+*.pid
+*.seed
+*.pid.lock
+# Database
+*.sqlite
+*.sqlite3
+# Misc
+.idea/
+*.swp
+*.swo
+*.bak
+*.tmp
+# Build
+/dist/
+/build/
+# Coverage
+coverage/
+# Production
+.env.production
+.env.local
+.env.development
+.env.test
+.env.*.local
