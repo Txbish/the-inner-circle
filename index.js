@@ -7,6 +7,8 @@ const logger = require("morgan");
 const passport = require("passport");
 const session = require("express-session");
 
+const authRoutes = require("./routes/auth");
+
 const app = express();
 
 console.log("🚀 Starting Express application...");
@@ -19,6 +21,10 @@ app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+// Routes
+app.use("/", authRoutes);
+
 app.get("/", (req, res) => {
   res.render("index");
 });

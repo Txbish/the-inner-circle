@@ -10,6 +10,12 @@
           <p class="text-muted">Join our exclusive community</p>
         </div>
 
+        <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-danger" role="alert">
+          <i class="fas fa-exclamation-triangle me-2"></i><%= error %>
+        </div>
+        <% } %>
+
         <form action="/register" method="post">
           <div class="row">
             <div class="col-md-6 mb-3">
@@ -20,6 +26,7 @@
                 type="text"
                 class="form-control"
                 placeholder="Enter your first name"
+                value="<%= typeof formData !== 'undefined' && formData.firstName ? formData.firstName : '' %>"
                 required
               />
             </div>
@@ -31,6 +38,7 @@
                 type="text"
                 class="form-control"
                 placeholder="Enter your last name"
+                value="<%= typeof formData !== 'undefined' && formData.lastName ? formData.lastName : '' %>"
                 required
               />
             </div>
@@ -44,6 +52,7 @@
               type="text"
               class="form-control"
               placeholder="Choose a username"
+              value="<%= typeof formData !== 'undefined' && formData.username ? formData.username : '' %>"
               required
             />
           </div>
@@ -56,6 +65,7 @@
               id="email"
               class="form-control"
               placeholder="Enter your email address"
+              value="<%= typeof formData !== 'undefined' && formData.email ? formData.email : '' %>"
               required
             />
           </div>
@@ -86,6 +96,36 @@
               minlength="6"
               required
             />
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label">Account Type</label>
+            <div class="d-flex gap-3">
+              <div class="form-check">
+                <input type="radio" name="admin" id="admin-yes"
+                class="form-check-input" value="admin" <% if (typeof formData
+                !== 'undefined' && formData.admin === 'admin') { %>checked<% }
+                %> />
+                <label class="form-check-label" for="admin-yes">
+                  <i class="fas fa-crown text-warning me-1"></i>Admin
+                </label>
+              </div>
+              <div class="form-check">
+                <input type="radio" name="admin" id="admin-no"
+                class="form-check-input" value="normal" <% if (typeof formData
+                === 'undefined' || formData.admin === 'normal' ||
+                !formData.admin) { %>checked<% } %> />
+                <label class="form-check-label" for="admin-no">
+                  <i class="fas fa-user text-primary me-1"></i>Regular Member
+                </label>
+              </div>
+            </div>
+            <div class="form-text text-muted">
+              <small
+                >Choose your account type. Admin accounts have additional
+                privileges.</small
+              >
+            </div>
           </div>
 
           <div class="d-grid mb-3">
