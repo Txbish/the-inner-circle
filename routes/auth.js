@@ -3,6 +3,63 @@ const bcrypt = require("bcryptjs");
 const { body, validationResult } = require("express-validator");
 const router = express.Router();
 const pool = require("../db.js");
+const passport = require("passport");
+const LocalPassport = require("passport-local");
+
+passport.serializeUser((user, done) => done(null, user.id));
+passport.deserializeUser(async (id, done) => {
+  try {
+    const result = await pool.query("Select * from users where id =$1", [id]);
+    if (result.rows[0]) {
+      done(null, result.rows[0]);
+    } else {
+      done(null, false);
+    }
+  } catch (error) {
+    done(error);
+  }
+});
+passport.use(
+  new LocalPassport.Strategy(async (username, password, done) => {
+    try {
+      const result = await pool.query(
+        "Select * from users where username = $1 OR email = $1",
+        [username]
+      );
+      if (!result.rows[0]) {
+        return done(null, false, { message: "User not found" });
+      }
+      const user = result.rows[0];
+      const matched = await bcrypt.compare(password, user.password);
+      if (!matched) {
+        return done(null, false, { message: "Password does not match" });
+      }
+      done(null, user);
+    } catch (error) {
+      done(error);
+    }
+  })
+);
+
+router.post("/login", (req, res, next) => {
+  passport.authenticate("local", (err, user, info) => {
+    if (err) {
+      return next(err);
+    }
+    if (!user) {
+      return res.render("login", {
+        error: info.message,
+        formData: req.body,
+      });
+    }
+    req.logIn(user, (err) => {
+      if (err) {
+        return next(err);
+      }
+      return res.redirect("/");
+    });
+  })(req, res, next);
+});
 
 router.post(
   "/register",

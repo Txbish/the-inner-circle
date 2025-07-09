@@ -22,6 +22,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "cats",
+    resave: false,
+    saveUninitialized: false,
+  })
+);
 // Routes
 app.use("/", authRoutes);
 
@@ -30,6 +37,13 @@ app.get("/", (req, res) => {
 });
 app.get("/register", (req, res) => {
   res.render("register");
+});
+app.get("/login", (req, res) => {
+  const successMessage =
+    req.query.registered === "true"
+      ? "Registration successful! Please log in with your credentials."
+      : null;
+  res.render("login", { successMessage });
 });
 app.listen(3000, () => {
   console.log("Server Started on Port 3000");
