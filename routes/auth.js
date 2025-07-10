@@ -272,4 +272,67 @@ router.post("/logout", (req, res, next) => {
   });
 });
 
+router.post(
+  "/create-message",
+  [
+    body("title")
+      .trim()
+      .isLength({ min: 1 })
+      .withMessage("Title can't be empty"),
+    body("content")
+      .trim()
+      .isLength({ min: 1 })
+      .withMessage("Message content can't be empty"),
+  ],
+  async (req, res) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).render("login", {
+          error: "Please log in to post a message",
+        });
+      }
+
+      // Handle validation errors
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.render("create-message", {
+          error: errors.array()[0].msg,
+          formData: req.body,
+          user: req.user,
+        });
+      }
+
+      const { title, content } = req.body;
+
+      // Fixed SQL query - added missing closing parenthesis and RETURNING clause
+      const result = await pool.query(
+        "INSERT INTO messages (author_id, title, content) VALUES ($1, $2, $3) RETURNING *",
+        [req.user.id, title, content]
+      );
+
+      if (result.rows[0]) {
+        // Success - redirect to messages page or show success
+        return res.render("create-message", {
+          success: "Message created successfully!",
+          user: req.user,
+        });
+      } else {
+        return res.render("create-message", {
+          error: "Unable to create message",
+          formData: req.body,
+          user: req.user,
+        });
+      }
+    } catch (error) {
+      console.error("Create message error:", error);
+      return res.render("create-message", {
+        error:
+          "An error occurred while creating the message. Please try again.",
+        formData: req.body,
+        user: req.user,
+      });
+    }
+  }
+);
+
 module.exports = router;
