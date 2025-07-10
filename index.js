@@ -87,7 +87,7 @@ app.get("/", (req, res) => {
 app.get("/register", (req, res) => {
   res.render("register", {
     user: req.user,
-    error: req.flash("error")[0]?.msg || [],
+    error: req.flash("error") || [],
     formData: req.flash("formData")[0],
   });
 });

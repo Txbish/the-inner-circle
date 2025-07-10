@@ -129,7 +129,7 @@ router.post(
       // Check for validation errors
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-        req.flash("error", errors.array());
+        req.flash("error", errors.array()[0].msg);
         req.flash("formData", req.body);
         return res.redirect("/register");
       }
