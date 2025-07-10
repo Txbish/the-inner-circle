@@ -273,7 +273,7 @@ router.post("/logout", (req, res, next) => {
 });
 
 router.post(
-  "/create-message",
+  "/message",
   [
     body("title")
       .trim()
@@ -335,4 +335,37 @@ router.post(
   }
 );
 
+router.get("/messages", async (req, res) => {
+  try {
+    if (!req.isAuthenticated()) {
+      return res.redirect("/login");
+    }
+    const result = await pool.query(`
+      SELECT 
+        m.id,
+        m.title,
+        m.content,
+        m.created_at,
+        u.first_name,
+        u.last_name,
+        u.username,
+        u.is_member
+      FROM messages m
+      JOIN users u ON m.author_id = u.id
+      ORDER BY m.created_at DESC
+    `);
+
+    return res.render("dashboard", {
+      messages: result.rows,
+      user: req.user,
+    });
+  } catch (error) {
+    console.error("Error fetching messages:", error);
+    return res.render("dashboard", {
+      error: "An error occurred while fetching messages. Please try again.",
+      messages: [],
+      user: req.user,
+    });
+  }
+});
 module.exports = router;
