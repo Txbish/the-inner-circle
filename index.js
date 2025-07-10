@@ -53,22 +53,33 @@ function ensureLoggedIn(req, res, next) {
 }
 
 // Routes
-app.use("/auth", authRoutes);
+app.use("/", authRoutes);
 app.get("/become-member", ensureLoggedIn, (req, res) => {
   res.render("become-member", { user: req.user });
 });
+
+app.get("/create-message", ensureLoggedIn, (req, res) => {
+  if (!req.user.is_member) {
+    return res.render("become-member", {
+      error: "You need to become a member first to create messages.",
+      user: req.user,
+    });
+  }
+  res.render("create-message", { user: req.user });
+});
+
 app.get("/", (req, res) => {
-  res.render("index");
+  res.render("index", { user: req.user });
 });
 app.get("/register", (req, res) => {
-  res.render("register");
+  res.render("register", { user: req.user });
 });
 app.get("/login", (req, res) => {
   const successMessage =
     req.query.registered === "true"
       ? "Registration successful! Please log in with your credentials."
       : null;
-  res.render("login", { successMessage });
+  res.render("login", { successMessage, user: req.user });
 });
 app.listen(3000, () => {
   console.log("Server Started on Port 3000");

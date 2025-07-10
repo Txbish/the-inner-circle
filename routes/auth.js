@@ -291,8 +291,6 @@ router.post(
           error: "Please log in to post a message",
         });
       }
-
-      // Handle validation errors
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         return res.render("create-message", {
@@ -304,14 +302,12 @@ router.post(
 
       const { title, content } = req.body;
 
-      // Fixed SQL query - added missing closing parenthesis and RETURNING clause
       const result = await pool.query(
         "INSERT INTO messages (author_id, title, content) VALUES ($1, $2, $3) RETURNING *",
         [req.user.id, title, content]
       );
 
       if (result.rows[0]) {
-        // Success - redirect to messages page or show success
         return res.render("create-message", {
           success: "Message created successfully!",
           user: req.user,
@@ -334,7 +330,6 @@ router.post(
     }
   }
 );
-
 router.get("/messages", async (req, res) => {
   try {
     if (!req.isAuthenticated()) {
@@ -354,7 +349,6 @@ router.get("/messages", async (req, res) => {
       JOIN users u ON m.author_id = u.id
       ORDER BY m.created_at DESC
     `);
-
     return res.render("dashboard", {
       messages: result.rows,
       user: req.user,
