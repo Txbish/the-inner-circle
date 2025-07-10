@@ -68,6 +68,11 @@ app.get("/create-message", ensureLoggedIn, (req, res) => {
   res.render("create-message", { user: req.user });
 });
 
+app.get("/dashboard", ensureLoggedIn, (req, res) => {
+  // Redirect to the messages route which handles the dashboard rendering
+  res.redirect("/messages");
+});
+
 app.get("/", (req, res) => {
   res.render("index", { user: req.user });
 });

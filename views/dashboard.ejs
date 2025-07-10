@@ -1,0 +1,247 @@
+<%- include('partials/header', { title: 'Dashboard - Members Only' }) %>
+
+<div class="row">
+  <div class="col-12">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h2 class="fw-bold text-dark">
+          <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+        </h2>
+        <p class="text-muted mb-0">
+          Welcome back, <%= user.first_name %>! Here are the latest messages
+          from our community.
+        </p>
+      </div>
+      <div>
+        <% if (user.is_member) { %>
+        <a href="/create-message" class="btn btn-primary">
+          <i class="fas fa-pen-fancy me-2"></i>Create Message
+        </a>
+        <% } else { %>
+        <a href="/become-member" class="btn btn-warning">
+          <i class="fas fa-star me-2"></i>Become Member
+        </a>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<% if (typeof error !== 'undefined' && error) { %>
+<div class="row">
+  <div class="col-12">
+    <div class="alert alert-danger" role="alert">
+      <i class="fas fa-exclamation-triangle me-2"></i><%= error %>
+    </div>
+  </div>
+</div>
+<% } %> <% if (user.is_member) { %>
+<!-- Member Status Banner -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="alert alert-success d-flex align-items-center" role="alert">
+      <i class="fas fa-star fa-2x text-warning me-3"></i>
+      <div>
+        <h5 class="alert-heading mb-1">
+          <i class="fas fa-crown text-warning me-1"></i>Member Access Active
+        </h5>
+        <p class="mb-0">
+          You have full access to all messages with complete details and author
+          information.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+<% } else { %>
+<!-- Non-Member Info Banner -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="alert alert-info d-flex align-items-center" role="alert">
+      <i class="fas fa-info-circle fa-2x text-info me-3"></i>
+      <div>
+        <h5 class="alert-heading mb-1">Limited Access</h5>
+        <p class="mb-0">
+          Messages are displayed anonymously.
+          <a href="/become-member" class="alert-link">Become a member</a>
+          to see full details and author information.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+<% } %>
+
+<!-- Messages Section -->
+<div class="row">
+  <div class="col-12">
+    <div class="card shadow-sm">
+      <div class="card-header bg-primary text-white">
+        <h5 class="card-title mb-0">
+          <i class="fas fa-comments me-2"></i>Community Messages
+          <span class="badge bg-light text-primary ms-2">
+            <%= typeof messages !== 'undefined' ? messages.length : 0 %>
+            messages
+          </span>
+        </h5>
+      </div>
+      <div class="card-body p-0">
+        <% if (typeof messages !== 'undefined' && messages.length > 0) { %> <%
+        messages.forEach((message, index) => { %>
+        <div
+          class="border-bottom <%= index === messages.length - 1 ? '' : 'border-bottom' %>"
+        >
+          <div class="p-4">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <div class="flex-grow-1">
+                <h5 class="mb-2">
+                  <% if (user.is_member) { %> <%= message.title %> <% } else {
+                  %>
+                  <span class="text-muted">[Message Title Hidden]</span>
+                  <% } %>
+                </h5>
+
+                <!-- Author Information -->
+                <div class="d-flex align-items-center mb-2">
+                  <% if (user.is_member) { %>
+                  <div
+                    class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-2"
+                    style="width: 32px; height: 32px"
+                  >
+                    <i class="fas fa-user text-white small"></i>
+                  </div>
+                  <div>
+                    <span class="fw-bold"
+                      ><%= message.first_name %> <%= message.last_name %></span
+                    >
+                    <small class="text-muted ms-2"
+                      >@<%= message.username %></small
+                    >
+                    <% if (message.is_member) { %>
+                    <span class="badge bg-warning text-dark ms-1">
+                      <i class="fas fa-star"></i> Member
+                    </span>
+                    <% } %>
+                  </div>
+                  <% } else { %>
+                  <div
+                    class="bg-secondary rounded-circle d-flex align-items-center justify-content-center me-2"
+                    style="width: 32px; height: 32px"
+                  >
+                    <i class="fas fa-user-secret text-white small"></i>
+                  </div>
+                  <span class="text-muted fst-italic">Anonymous User</span>
+                  <% } %>
+                </div>
+              </div>
+
+              <!-- Timestamp -->
+              <div class="text-end">
+                <% if (user.is_member && message.created_at) { %>
+                <small class="text-muted">
+                  <i class="fas fa-clock me-1"></i>
+                  <%= new Date(message.created_at).toLocaleDateString() %>
+                </small>
+                <% } else { %>
+                <small class="text-muted">
+                  <i class="fas fa-clock me-1"></i>Recently
+                </small>
+                <% } %>
+              </div>
+            </div>
+
+            <!-- Message Content -->
+            <div class="message-content">
+              <% if (user.is_member) { %>
+              <p class="mb-0"><%= message.content %></p>
+              <% } else { %>
+              <p class="mb-0 text-muted fst-italic">
+                [Message content is only visible to members.
+                <a href="/become-member" class="text-decoration-none"
+                  >Become a member</a
+                >
+                to read full messages.]
+              </p>
+              <% } %>
+            </div>
+
+            <!-- Action Buttons for Members -->
+            <% if (user.is_member) { %>
+            <div class="mt-3 pt-3 border-top">
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="btn-group" role="group">
+                  <button type="button" class="btn btn-outline-primary btn-sm">
+                    <i class="fas fa-thumbs-up me-1"></i>Like
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-outline-secondary btn-sm"
+                  >
+                    <i class="fas fa-reply me-1"></i>Reply
+                  </button>
+                </div>
+                <small class="text-muted">Message #<%= message.id %></small>
+              </div>
+            </div>
+            <% } %>
+          </div>
+        </div>
+        <% }); %> <% } else { %>
+        <!-- No Messages State -->
+        <div class="text-center py-5">
+          <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+          <h5 class="text-muted">No messages yet</h5>
+          <p class="text-muted">Be the first to start a conversation!</p>
+          <% if (user.is_member) { %>
+          <a href="/create-message" class="btn btn-primary">
+            <i class="fas fa-pen-fancy me-2"></i>Create First Message
+          </a>
+          <% } else { %>
+          <a href="/become-member" class="btn btn-warning">
+            <i class="fas fa-star me-2"></i>Become Member to Post
+          </a>
+          <% } %>
+        </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Stats Section for Members -->
+<% if (user.is_member && typeof messages !== 'undefined' && messages.length > 0)
+{ %>
+<div class="row mt-4">
+  <div class="col-md-4">
+    <div class="card text-center">
+      <div class="card-body">
+        <i class="fas fa-comments fa-2x text-primary mb-2"></i>
+        <h4 class="card-title"><%= messages.length %></h4>
+        <p class="card-text text-muted">Total Messages</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card text-center">
+      <div class="card-body">
+        <i class="fas fa-users fa-2x text-success mb-2"></i>
+        <h4 class="card-title">
+          <%= [...new Set(messages.map(m => m.username))].length %>
+        </h4>
+        <p class="card-text text-muted">Active Contributors</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card text-center">
+      <div class="card-body">
+        <i class="fas fa-star fa-2x text-warning mb-2"></i>
+        <h4 class="card-title">
+          <%= messages.filter(m => m.is_member).length %>
+        </h4>
+        <p class="card-text text-muted">Member Posts</p>
+      </div>
+    </div>
+  </div>
+</div>
+<% } %> <%- include('partials/footer') %>
