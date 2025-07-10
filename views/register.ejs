@@ -1,125 +1,116 @@
 <%- include('partials/header', { title: 'Register' }) %>
 
-<div class="row justify-content-center">
-  <div class="col-md-8 col-lg-6">
-    <div class="card">
-      <div class="card-body p-4 p-md-5">
-        <div class="text-center mb-4">
-          <h2 class="fw-bold">Create an Account</h2>
-          <p class="text-muted">Join The Inner Circle today.</p>
-        </div>
+<div class="container main-content">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card">
+        <div class="card-body p-4 p-md-5">
+          <div class="text-center mb-4">
+            <h2 class="fw-bold">Create an Account</h2>
+            <p class="text-muted">Join The Inner Circle today.</p>
+          </div>
 
-        <% if (typeof error !== 'undefined' && error) { %>
-        <div class="alert alert-danger" role="alert">
-          <i class="fas fa-exclamation-triangle me-2"></i><%= error %>
-        </div>
-        <% } %>
-
-        <form action="/register" method="post">
-          <div class="row">
-            <div class="col-md-6">
-              <div class="form-floating mb-3">
-                <input
-                  type="text"
-                  class="form-control"
-                  id="first_name"
-                  name="first_name"
-                  placeholder="First Name"
-                  value="<%= typeof formData !== 'undefined' && formData.firstName ? formData.firstName : '' %>"
-                  required
-                />
-                <label for="first_name">First Name</label>
+          <form action="/register" method="post">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-floating mb-3">
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="first_name"
+                    name="first_name"
+                    placeholder="First Name"
+                    value="<%= typeof formData !== 'undefined' && formData.firstName ? formData.firstName : '' %>"
+                    required
+                  />
+                  <label for="first_name">First Name</label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-floating mb-3">
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="last_name"
+                    name="last_name"
+                    placeholder="Last Name"
+                    value="<%= typeof formData !== 'undefined' && formData.lastName ? formData.lastName : '' %>"
+                    required
+                  />
+                  <label for="last_name">Last Name</label>
+                </div>
               </div>
             </div>
-            <div class="col-md-6">
-              <div class="form-floating mb-3">
-                <input
-                  type="text"
-                  class="form-control"
-                  id="last_name"
-                  name="last_name"
-                  placeholder="Last Name"
-                  value="<%= typeof formData !== 'undefined' && formData.lastName ? formData.lastName : '' %>"
-                  required
-                />
-                <label for="last_name">Last Name</label>
+            <div class="form-floating mb-3">
+              <input
+                type="text"
+                class="form-control"
+                id="username"
+                name="username"
+                placeholder="Username"
+                value="<%= typeof formData !== 'undefined' && formData.username ? formData.username : '' %>"
+                required
+              />
+              <label for="username">Username</label>
+            </div>
+            <div class="form-floating mb-3">
+              <input
+                type="email"
+                class="form-control"
+                id="email"
+                name="email"
+                placeholder="name@example.com"
+                value="<%= typeof formData !== 'undefined' && formData.email ? formData.email : '' %>"
+                required
+              />
+              <label for="email">Email address</label>
+            </div>
+            <div class="form-floating mb-3">
+              <input
+                type="password"
+                class="form-control"
+                id="password"
+                name="password"
+                placeholder="Password"
+                minlength="6"
+                required
+              />
+              <label for="password">Password</label>
+            </div>
+            <div class="form-floating mb-3">
+              <input
+                type="password"
+                class="form-control"
+                id="confirm_password"
+                name="confirm_password"
+                placeholder="Confirm Password"
+                minlength="6"
+                required
+              />
+              <label for="confirm_password">Confirm Password</label>
+            </div>
+
+            <div class="form-floating mb-3">
+              <input
+                type="password"
+                class="form-control"
+                id="admin_code"
+                name="admin_code"
+                placeholder="Admin Code (Optional)"
+              />
+              <label for="admin_code">Admin Code (Optional)</label>
+              <div class="form-text">
+                If you have an admin code, enter it here to register as an
+                administrator.
               </div>
             </div>
-          </div>
-          <div class="form-floating mb-3">
-            <input
-              type="text"
-              class="form-control"
-              id="username"
-              name="username"
-              placeholder="Username"
-              value="<%= typeof formData !== 'undefined' && formData.username ? formData.username : '' %>"
-              required
-            />
-            <label for="username">Username</label>
-          </div>
-          <div class="form-floating mb-3">
-            <input
-              type="email"
-              class="form-control"
-              id="email"
-              name="email"
-              placeholder="name@example.com"
-              value="<%= typeof formData !== 'undefined' && formData.email ? formData.email : '' %>"
-              required
-            />
-            <label for="email">Email address</label>
-          </div>
-          <div class="form-floating mb-3">
-            <input
-              type="password"
-              class="form-control"
-              id="password"
-              name="password"
-              placeholder="Password"
-              minlength="6"
-              required
-            />
-            <label for="password">Password</label>
-          </div>
-          <div class="form-floating mb-3">
-            <input
-              type="password"
-              class="form-control"
-              id="confirm_password"
-              name="confirm_password"
-              placeholder="Confirm Password"
-              minlength="6"
-              required
-            />
-            <label for="confirm_password">Confirm Password</label>
-          </div>
 
-          <div class="form-floating mb-3">
-            <input
-              type="password"
-              class="form-control"
-              id="admin_code"
-              name="admin_code"
-              placeholder="Admin Code (Optional)"
-            />
-            <label for="admin_code">Admin Code (Optional)</label>
-            <div class="form-text">
-              If you have an admin code, enter it here to register as an
-              administrator.
+            <div class="d-grid mb-4">
+              <button type="submit" class="btn btn-primary btn-lg">
+                <i class="fas fa-user-plus me-2"></i>Register
+              </button>
             </div>
-          </div>
-
-          <div class="d-grid mb-4">
-            <button type="submit" class="btn btn-primary btn-lg">
-              <i class="fas fa-user-plus me-2"></i>Register
-            </button>
-          </div>
-        </form>
-        <div class="text-center mt-4">
-          <p class="text-muted">
-            Already have an account? <a href="/login">Login</a>
-          </p>
+          </form>
         </div>
       </div>
     </div>

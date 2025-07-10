@@ -1,106 +1,93 @@
 <%- include('partials/header', { title: 'Dashboard' }) %>
 
-<style>
-  .message-card {
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-  }
-  .message-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
-  }
-  .no-messages-prompt {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 300px;
-    border: 2px dashed #e0e0e0;
-    border-radius: 12px;
-    background-color: #fafafa;
-  }
-  .no-messages-prompt i {
-    font-size: 4rem;
-    color: #cccccc;
-  }
-</style>
+<div class="container main-content">
+  <style>
+    .message-card {
+      transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+    .message-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    }
+    .no-messages-prompt {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 300px;
+      border: 2px dashed #e0e0e0;
+      border-radius: 12px;
+      background-color: #fafafa;
+    }
+    .no-messages-prompt i {
+      font-size: 4rem;
+      color: #cccccc;
+    }
+  </style>
 
-<div
-  class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom"
->
-  <div>
-    <h1 class="fw-bold mb-0">Community Feed</h1>
-    <p class="text-muted mb-0">Latest posts from our members.</p>
-  </div>
-  <% if (user.is_member) { %>
-  <a href="/create-message" class="btn btn-primary"
-    ><i class="fas fa-plus-circle me-1"></i> New Post</a
+  <div
+    class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom"
   >
-  <% } else { %>
-  <a href="/become-member" class="btn btn-primary"
-    ><i class="fas fa-star me-1"></i> Become a Member</a
-  >
-  <% } %>
-</div>
-
-<% if (!user.is_member) { %>
-<div class="alert alert-info d-flex align-items-center" role="alert">
-  <i class="fas fa-info-circle fa-2x me-3"></i>
-  <div>
-    <h5 class="alert-heading">Limited Access</h5>
-    <p class="mb-0">
-      As a non-member, you can only see that messages exist.
-      <a href="/become-member" class="alert-link">Become a member</a> to view
-      posts, authors, and dates.
-    </p>
+    <div>
+      <h1 class="fw-bold mb-0">Community Feed</h1>
+      <p class="text-muted mb-0">Latest posts from our members.</p>
+    </div>
+    <% if (user.is_member) { %>
+    <a href="/create-message" class="btn btn-primary"
+      ><i class="fas fa-plus-circle me-1"></i> New Post</a
+    >
+    <% } else { %>
+    <a href="/become-member" class="btn btn-primary"
+      ><i class="fas fa-star me-1"></i> Become a Member</a
+    >
+    <% } %>
   </div>
-</div>
-<% } %>
 
-<div class="row justify-content-center">
-  <div class="col-lg-8">
-    <% if (typeof messages !== 'undefined' && messages.length > 0) { %> <%
-    messages.forEach(message => { %>
-    <div class="card message-card mb-4">
-      <div class="card-body d-flex flex-column">
-        <h5 class="card-title"><%= message.title %></h5>
-        <% if (user.is_member) { %>
-        <p class="card-text flex-grow-1"><%= message.text %></p>
-        <div class="mt-auto pt-3 border-top">
-          <small class="text-muted">
-            By <%= message.user.first_name %> <%= message.user.last_name %>
-          </small>
-          <br />
-          <small class="text-muted">
-            <%= new Date(message.timestamp).toLocaleString() %>
-          </small>
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <% if (typeof messages !== 'undefined' && messages.length > 0) { %> <%
+      messages.forEach(message => { %>
+      <div class="card message-card mb-4">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title"><%= message.title %></h5>
+          <p class="card-text flex-grow-1"><%= message.text %></p>
+          <div class="mt-auto pt-3 border-top">
+            <% if (user.is_member) { %>
+            <small class="text-muted">
+              By <%= message.user.first_name %> <%= message.user.last_name %>
+            </small>
+            <br />
+            <small class="text-muted">
+              <%= new Date(message.timestamp).toLocaleString() %>
+            </small>
+            <% } else { %>
+            <small class="text-muted"> By Anonymous </small>
+            <% } %>
+          </div>
+          <% if (user && user.is_admin) { %>
+          <form
+            action="/delete-message/<%= message._id %>"
+            method="post"
+            class="mt-3"
+          >
+            <button type="submit" class="btn btn-sm btn-outline-danger">
+              <i class="fas fa-trash-alt me-1"></i> Delete
+            </button>
+          </form>
+          <% } %>
         </div>
-        <% } else { %>
-        <p class="card-text flex-grow-1 fst-italic text-muted">
-          [Content hidden for non-members]
-        </p>
-        <% } %> <% if (user && user.is_admin) { %>
-        <form
-          action="/delete-message/<%= message._id %>"
-          method="post"
-          class="mt-3"
-        >
-          <button type="submit" class="btn btn-sm btn-outline-danger">
-            <i class="fas fa-trash-alt me-1"></i> Delete
-          </button>
-        </form>
+      </div>
+      <% }) %> <% } else { %>
+      <div class="no-messages-prompt text-center">
+        <i class="fas fa-comments mb-3"></i>
+        <h4 class="text-muted">No Messages Yet</h4>
+        <p class="text-muted">Be the first to post and start a conversation!</p>
+        <% if (user.is_member) { %>
+        <a href="/create-message" class="btn btn-primary mt-2">Create a Post</a>
         <% } %>
       </div>
-    </div>
-    <% }) %> <% } else { %>
-    <div class="no-messages-prompt text-center">
-      <i class="fas fa-comments mb-3"></i>
-      <h4 class="text-muted">No Messages Yet</h4>
-      <p class="text-muted">Be the first to post and start a conversation!</p>
-      <% if (user.is_member) { %>
-      <a href="/create-message" class="btn btn-primary mt-2">Create a Post</a>
       <% } %>
     </div>
-    <% } %>
   </div>
 </div>
 

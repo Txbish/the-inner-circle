@@ -69,22 +69,10 @@ router.post(
     }
 
     // Proceed with passport authentication if validation passes
-    passport.authenticate("local", (err, user, info) => {
-      if (err) {
-        return next(err);
-      }
-      if (!user) {
-        return res.render("login", {
-          error: info.message,
-          formData: req.body,
-        });
-      }
-      req.logIn(user, (err) => {
-        if (err) {
-          return next(err);
-        }
-        return res.redirect("/dashboard");
-      });
+    passport.authenticate("local", {
+      successRedirect: "/messages",
+      failureRedirect: "/login",
+      failureFlash: true,
     })(req, res, next);
   }
 );
@@ -141,11 +129,9 @@ router.post(
       // Check for validation errors
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-        const errorMessages = errors.array().map((error) => error.msg);
-        return res.render("register", {
-          errors: errorMessages,
-          formData: req.body,
-        });
+        req.flash("error", errors.array());
+        req.flash("formData", req.body);
+        return res.redirect("/register");
       }
 
       const { first_name, last_name, username, email, password, admin_code } =
@@ -160,12 +146,12 @@ router.post(
       );
 
       if (existingUser.rows.length > 0) {
-        return res.render("register", {
-          errors: [
-            "Username or email already exists. Please choose different ones.",
-          ],
-          formData: req.body,
-        });
+        req.flash(
+          "error",
+          "Username or email already exists. Please choose different ones."
+        );
+        req.flash("formData", req.body);
+        return res.redirect("/register");
       }
 
       const saltRounds = 10;
@@ -184,13 +170,19 @@ router.post(
         ]
       );
 
-      res.redirect("/login?registered=true");
+      req.flash(
+        "success",
+        "Registration successful! Please log in with your credentials."
+      );
+      res.redirect("/login");
     } catch (error) {
       console.error("Registration error:", error);
-      res.render("register", {
-        errors: ["An error occurred during registration. Please try again."],
-        formData: req.body,
-      });
+      req.flash(
+        "error",
+        "An error occurred during registration. Please try again."
+      );
+      req.flash("formData", req.body);
+      return res.redirect("/register");
     }
   }
 );
@@ -230,6 +222,11 @@ router.post(
       }
 
       // Update membership status
+      if (req.body.secret_code !== process.env.MEMBER_CODE) {
+        req.flash("error", "The secret passcode is incorrect.");
+        return res.redirect("/become-member");
+      }
+
       const { rowCount } = await pool.query(
         "UPDATE users SET is_member = true WHERE id = $1",
         [req.user.id]
@@ -241,18 +238,12 @@ router.post(
 
       // Update the user object for the session
       req.user.is_member = true;
-
-      res.render("become-member", {
-        success: "Congratulations! You are now a member!",
-        user: req.user,
-      });
+      req.flash("successMessage", "Congratulations! You have become a member.");
+      res.redirect("/dashboard");
     } catch (error) {
       console.error("Error changing membership status:", error);
-      res.status(500).render("become-member", {
-        error: "An error occurred. Please try again.",
-        formData: req.body,
-        user: req.user,
-      });
+      req.flash("error", "An error occurred. Please try again.");
+      res.redirect("/become-member");
     }
   }
 );
@@ -309,10 +300,8 @@ router.post(
       );
 
       if (result.rows[0]) {
-        return res.render("create-message", {
-          success: "Message created successfully!",
-          user: req.user,
-        });
+        req.flash("successMessage", "Message created successfully!");
+        return res.redirect("/messages");
       } else {
         return res.render("create-message", {
           error: "Unable to create message",
@@ -377,10 +366,12 @@ router.post("/delete-message/:id", ensureLoggedIn, async (req, res) => {
     }
     const messageId = req.params.id;
     await pool.query("DELETE FROM messages WHERE id = $1", [messageId]);
-    res.redirect("/dashboard");
+    req.flash("successMessage", "Message deleted successfully.");
+    res.redirect("/messages");
   } catch (error) {
     console.error("Error deleting message:", error);
-    res.redirect("/dashboard");
+    req.flash("error", "Error deleting message.");
+    res.redirect("/messages");
   }
 });
 

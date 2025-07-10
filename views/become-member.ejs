@@ -1,32 +1,49 @@
 <%- include('partials/header', { title: 'Become a Member' }) %>
 
-<div class="row justify-content-center">
-  <div class="col-md-6">
-    <div class="card">
-      <div class="card-body p-4 p-md-5 text-center">
-        <i class="fas fa-star fa-3x text-warning mb-3"></i>
-        <h2 class="fw-bold">Become a Member</h2>
-        <p class="text-muted">
-          Enter the secret code to unlock full access to The Inner Circle.
-        </p>
-        <form action="/become-member" method="post" class="mt-4">
-          <div class="form-floating mb-3">
-            <input
-              type="password"
-              class="form-control"
-              id="secret_code"
-              name="secret_code"
-              placeholder="Secret Code"
-              required
-            />
-            <label for="secret_code">Secret Code</label>
+<div class="container main-content">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card">
+        <div class="card-body p-4 p-md-5">
+          <div class="text-center mb-4">
+            <h2 class="fw-bold">Become a Full Member</h2>
+            <p class="text-muted">
+              Unlock full access by entering the secret passcode.
+            </p>
           </div>
-          <div class="d-grid">
-            <button type="submit" class="btn btn-primary btn-lg">
-              Unlock Membership
-            </button>
+
+          <% if (user.is_member) { %>
+          <div class="alert alert-success text-center" role="alert">
+            <h4 class="alert-heading">
+              <i class="fas fa-check-circle me-2"></i>You Are Already a Member!
+            </h4>
+            <p>You have full access to all community features.</p>
+            <hr />
+            <a href="/dashboard" class="btn btn-primary"
+              ><i class="fas fa-tachometer-alt me-1"></i>Go to Dashboard</a
+            >
           </div>
-        </form>
+          <% } else { %>
+          <form action="/become-member" method="post">
+            <div class="form-floating mb-3">
+              <input
+                type="password"
+                class="form-control"
+                id="secret_code"
+                name="secret_code"
+                placeholder="Secret Passcode"
+                required
+              />
+              <label for="secret_code">Secret Passcode</label>
+            </div>
+            <div class="d-grid">
+              <button type="submit" class="btn btn-primary btn-lg">
+                <i class="fas fa-lock-open me-2"></i>Unlock Membership
+              </button>
+            </div>
+          </form>
+          <% } %>
+        </div>
       </div>
     </div>
   </div>

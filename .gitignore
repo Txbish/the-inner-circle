@@ -6,7 +6,7 @@ yarn-error.log
 .env
 .DS_Store
 *.local
-*.env.*
+*.env
 # VSCode
 .vscode/
 # OS

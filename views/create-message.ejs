@@ -1,42 +1,44 @@
-<%- include('partials/header', { title: 'Create Message' }) %>
+<%- include('partials/header', { title: 'Create a New Post' }) %>
 
-<div class="row justify-content-center">
-  <div class="col-md-8">
-    <div class="card">
-      <div class="card-body p-4 p-md-5">
-        <div class="text-center mb-4">
-          <h2 class="fw-bold">Create a New Post</h2>
-          <p class="text-muted">Share your thoughts with the community.</p>
+<div class="container main-content">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-body p-4 p-md-5">
+          <div class="text-center mb-4">
+            <h2 class="fw-bold">Create a New Post</h2>
+            <p class="text-muted">Share your thoughts with the community.</p>
+          </div>
+          <form action="/create-message" method="post">
+            <div class="form-floating mb-3">
+              <input
+                type="text"
+                class="form-control"
+                id="title"
+                name="title"
+                placeholder="Post Title"
+                required
+              />
+              <label for="title">Title</label>
+            </div>
+            <div class="form-floating mb-3">
+              <textarea
+                class="form-control"
+                placeholder="What's on your mind?"
+                id="text"
+                name="text"
+                style="height: 150px"
+                required
+              ></textarea>
+              <label for="text">Message</label>
+            </div>
+            <div class="d-grid">
+              <button type="submit" class="btn btn-primary btn-lg">
+                Submit Post
+              </button>
+            </div>
+          </form>
         </div>
-        <form action="/create-message" method="post">
-          <div class="form-floating mb-3">
-            <input
-              type="text"
-              class="form-control"
-              id="title"
-              name="title"
-              placeholder="Post Title"
-              required
-            />
-            <label for="title">Title</label>
-          </div>
-          <div class="form-floating mb-3">
-            <textarea
-              class="form-control"
-              placeholder="What's on your mind?"
-              id="text"
-              name="text"
-              style="height: 150px"
-              required
-            ></textarea>
-            <label for="text">Message</label>
-          </div>
-          <div class="d-grid">
-            <button type="submit" class="btn btn-primary btn-lg">
-              Submit Post
-            </button>
-          </div>
-        </form>
       </div>
     </div>
   </div>

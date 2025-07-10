@@ -8,6 +8,7 @@ const passport = require("passport");
 const session = require("express-session");
 const pgSession = require("connect-pg-simple")(session);
 const pool = require("./db");
+const flash = require("connect-flash");
 
 const authRoutes = require("./routes/auth");
 const app = express();
@@ -45,6 +46,8 @@ app.use(
   })
 );
 
+app.use(flash());
+
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -57,7 +60,11 @@ function ensureLoggedIn(req, res, next) {
 app.use("/", authRoutes);
 
 app.get("/become-member", ensureLoggedIn, (req, res) => {
-  res.render("become-member", { user: req.user });
+  res.render("become-member", {
+    user: req.user,
+    error: req.flash("error"),
+    successMessage: req.flash("successMessage"),
+  });
 });
 
 app.get("/create-message", ensureLoggedIn, (req, res) => {
@@ -78,14 +85,19 @@ app.get("/", (req, res) => {
   res.render("index", { user: req.user });
 });
 app.get("/register", (req, res) => {
-  res.render("register", { user: req.user });
+  res.render("register", {
+    user: req.user,
+    error: req.flash("error")[0]?.msg || [],
+    formData: req.flash("formData")[0],
+  });
 });
 app.get("/login", (req, res) => {
-  const successMessage =
-    req.query.registered === "true"
-      ? "Registration successful! Please log in with your credentials."
-      : null;
-  res.render("login", { successMessage, user: req.user });
+  const successMessage = req.flash("success");
+  res.render("login", {
+    successMessage,
+    user: req.user,
+    error: req.flash("error"),
+  });
 });
 app.listen(3000, () => {
   console.log("Server Started on Port 3000");

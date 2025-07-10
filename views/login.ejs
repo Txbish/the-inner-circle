@@ -1,44 +1,48 @@
-<%- include('partials/header', { title: 'Login' }) %>
+<%- include('partials/header', { title: 'login' }) %>
 
-<div class="row justify-content-center">
-  <div class="col-md-6 col-lg-4">
-    <div class="card">
-      <div class="card-body p-4 p-md-5">
-        <div class="text-center mb-4">
-          <h2 class="fw-bold">Log In</h2>
-          <p class="text-muted">Access your Inner Circle account.</p>
-        </div>
-        <form action="/login" method="post">
-          <div class="form-floating mb-3">
-            <input
-              type="text"
-              class="form-control"
-              id="username"
-              name="username"
-              placeholder="Username"
-              required
-            />
-            <label for="username">Username</label>
+<div class="container main-content">
+  <div class="row justify-content-center align-items-center">
+    <div class="col-md-6 col-lg-4">
+      <div class="card">
+        <div class="card-body p-4 p-md-5">
+          <div class="text-center mb-4">
+            <h2 class="fw-bold">Log In</h2>
+            <p class="text-muted">Access your Inner Circle account.</p>
           </div>
-          <div class="form-floating mb-3">
-            <input
-              type="password"
-              class="form-control"
-              id="password"
-              name="password"
-              placeholder="Password"
-              required
-            />
-            <label for="password">Password</label>
+          <form action="/login" method="post">
+            <div class="form-floating mb-3">
+              <input
+                type="text"
+                class="form-control"
+                id="username"
+                name="username"
+                placeholder="Username"
+                required
+              />
+              <label for="username">Username</label>
+            </div>
+            <div class="form-floating mb-3">
+              <input
+                type="password"
+                class="form-control"
+                id="password"
+                name="password"
+                placeholder="Password"
+                required
+              />
+              <label for="password">Password</label>
+            </div>
+            <div class="d-grid">
+              <button type="submit" class="btn btn-primary btn-lg">
+                Login
+              </button>
+            </div>
+          </form>
+          <div class="text-center mt-4">
+            <p class="text-muted">
+              Don't have an account? <a href="/register">Register</a>
+            </p>
           </div>
-          <div class="d-grid">
-            <button type="submit" class="btn btn-primary btn-lg">Login</button>
-          </div>
-        </form>
-        <div class="text-center mt-4">
-          <p class="text-muted">
-            Don't have an account? <a href="/register">Register</a>
-          </p>
         </div>
       </div>
     </div>
