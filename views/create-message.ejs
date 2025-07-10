@@ -1,128 +1,39 @@
-<%- include('partials/header', { title: 'Create Message - Members Only' }) %>
+<%- include('partials/header', { title: 'Create Message' }) %>
 
 <div class="row justify-content-center">
-  <div class="col-lg-8 col-md-10">
-    <div class="card shadow-lg border-0">
-      <div class="card-body p-5">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-body p-4 p-md-5">
         <div class="text-center mb-4">
-          <i class="fas fa-pen-fancy fa-3x text-primary mb-3"></i>
-          <h2 class="fw-bold text-dark">Create New Message</h2>
-          <p class="text-muted">Share your thoughts with fellow members</p>
+          <h2 class="fw-bold">Create a New Post</h2>
+          <p class="text-muted">Share your thoughts with the community.</p>
         </div>
-
-        <% if (typeof error !== 'undefined' && error) { %>
-        <div class="alert alert-danger" role="alert">
-          <i class="fas fa-exclamation-triangle me-2"></i><%= error %>
-        </div>
-        <% } %> <% if (typeof success !== 'undefined' && success) { %>
-        <div class="alert alert-success" role="alert">
-          <i class="fas fa-check-circle me-2"></i><%= success %>
-          <div class="mt-2">
-            <a href="/messages" class="btn btn-sm btn-outline-success">
-              <i class="fas fa-eye me-1"></i>View All Messages
-            </a>
-          </div>
-        </div>
-        <% } %>
-
-        <form action="/message" method="post">
-          <div class="mb-4">
-            <label for="title" class="form-label">
-              <i class="fas fa-heading me-1"></i>Message Title
-            </label>
+        <form action="/create-message" method="post">
+          <div class="form-floating mb-3">
             <input
-              name="title"
-              id="title"
               type="text"
-              class="form-control form-control-lg"
-              placeholder="Enter an engaging title for your message"
-              value="<%= typeof formData !== 'undefined' && formData.title ? formData.title : '' %>"
-              maxlength="100"
+              class="form-control"
+              id="title"
+              name="title"
+              placeholder="Post Title"
               required
             />
-            <div class="form-text">
-              <small
-                >Make it catchy! This will be the first thing members
-                see.</small
-              >
-            </div>
+            <label for="title">Title</label>
           </div>
-
-          <div class="mb-4">
-            <label for="content" class="form-label">
-              <i class="fas fa-align-left me-1"></i>Message Content
-            </label>
+          <div class="form-floating mb-3">
             <textarea
-              name="content"
-              id="content"
               class="form-control"
-              rows="8"
-              placeholder="Share your thoughts, ideas, or start a discussion..."
-              maxlength="2000"
+              placeholder="What's on your mind?"
+              id="text"
+              name="text"
+              style="height: 150px"
               required
-            >
-<%= typeof formData !== 'undefined' && formData.content ? formData.content : '' %></textarea
-            >
-            <div class="form-text d-flex justify-content-between">
-              <small>Express yourself! What's on your mind?</small>
-              <small id="charCount" class="text-muted">0 / 2000</small>
-            </div>
+            ></textarea>
+            <label for="text">Message</label>
           </div>
-
-          <div class="row">
-            <div class="col-md-6 mb-3">
-              <div class="card bg-light">
-                <div class="card-body p-3">
-                  <h6 class="card-title mb-2">
-                    <i class="fas fa-info-circle text-info me-1"></i>Posting as:
-                  </h6>
-                  <div class="d-flex align-items-center">
-                    <div
-                      class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-2"
-                      style="width: 40px; height: 40px"
-                    >
-                      <i class="fas fa-user text-white"></i>
-                    </div>
-                    <div>
-                      <div class="fw-bold">
-                        <%= user.first_name %> <%= user.last_name %>
-                      </div>
-                      <small class="text-muted">@<%= user.username %></small>
-                      <% if (user.is_member) { %>
-                      <span class="badge bg-warning text-dark ms-1">
-                        <i class="fas fa-star"></i> Member
-                      </span>
-                      <% } %>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-6 mb-3">
-              <div class="card bg-light">
-                <div class="card-body p-3">
-                  <h6 class="card-title mb-2">
-                    <i class="fas fa-users text-success me-1"></i>Who can see
-                    this:
-                  </h6>
-                  <p class="mb-0 small">
-                    <i class="fas fa-check text-success me-1"></i>All registered
-                    users<br />
-                    <% if (user.is_member) { %>
-                    <i class="fas fa-star text-warning me-1"></i>Members will
-                    see your member status <% } %>
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="d-grid gap-2 d-md-flex justify-content-md-between">
-            <a href="/messages" class="btn btn-outline-secondary btn-lg">
-              <i class="fas fa-arrow-left me-2"></i>Back to Messages
-            </a>
+          <div class="d-grid">
             <button type="submit" class="btn btn-primary btn-lg">
-              <i class="fas fa-paper-plane me-2"></i>Post Message
+              Submit Post
             </button>
           </div>
         </form>
@@ -130,77 +41,5 @@
     </div>
   </div>
 </div>
-
-<div class="row mt-4">
-  <div class="col-12">
-    <div class="card bg-light">
-      <div class="card-body">
-        <h5 class="card-title">
-          <i class="fas fa-lightbulb text-warning me-2"></i>Tips for Great
-          Messages
-        </h5>
-        <div class="row">
-          <div class="col-md-4">
-            <div class="text-center p-3">
-              <i class="fas fa-heart fa-2x text-danger mb-2"></i>
-              <h6>Be Respectful</h6>
-              <p class="small text-muted">
-                Treat fellow members with kindness and respect
-              </p>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="text-center p-3">
-              <i class="fas fa-comment-dots fa-2x text-primary mb-2"></i>
-              <h6>Start Discussions</h6>
-              <p class="small text-muted">
-                Ask questions or share interesting topics
-              </p>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="text-center p-3">
-              <i class="fas fa-share-alt fa-2x text-success mb-2"></i>
-              <h6>Share Knowledge</h6>
-              <p class="small text-muted">Help others learn something new</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script>
-  // Character counter for content textarea
-  document.addEventListener("DOMContentLoaded", function () {
-    const contentTextarea = document.getElementById("content");
-    const charCount = document.getElementById("charCount");
-
-    function updateCharCount() {
-      const currentLength = contentTextarea.value.length;
-      charCount.textContent = `${currentLength} / 2000`;
-
-      if (currentLength > 1800) {
-        charCount.classList.add("text-warning");
-      } else if (currentLength > 1950) {
-        charCount.classList.add("text-danger");
-        charCount.classList.remove("text-warning");
-      } else {
-        charCount.classList.remove("text-warning", "text-danger");
-        charCount.classList.add("text-muted");
-      }
-    }
-
-    contentTextarea.addEventListener("input", updateCharCount);
-    updateCharCount(); // Initial count
-
-    // Auto-resize textarea
-    contentTextarea.addEventListener("input", function () {
-      this.style.height = "auto";
-      this.style.height = this.scrollHeight + "px";
-    });
-  });
-</script>
 
 <%- include('partials/footer') %>

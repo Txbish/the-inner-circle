@@ -6,6 +6,11 @@ const pool = require("../db.js");
 const passport = require("passport");
 const LocalPassport = require("passport-local");
 
+function ensureLoggedIn(req, res, next) {
+  if (req.isAuthenticated()) return next();
+  res.redirect("/login");
+}
+
 passport.serializeUser((user, done) => done(null, user.id));
 passport.deserializeUser(async (id, done) => {
   try {
@@ -78,7 +83,7 @@ router.post(
         if (err) {
           return next(err);
         }
-        return res.redirect("/");
+        return res.redirect("/dashboard");
       });
     })(req, res, next);
   }
@@ -87,14 +92,14 @@ router.post(
 router.post(
   "/register",
   [
-    body("first-name")
+    body("first_name")
       .trim()
       .isLength({ min: 2, max: 50 })
       .withMessage("First name must be between 2 and 50 characters")
       .matches(/^[a-zA-Z\s]+$/)
       .withMessage("First name can only contain letters and spaces"),
 
-    body("last-name")
+    body("last_name")
       .trim()
       .isLength({ min: 2, max: 50 })
       .withMessage("Last name must be between 2 and 50 characters")
@@ -124,16 +129,12 @@ router.post(
         "Password must contain at least one lowercase letter, one uppercase letter, and one number"
       ),
 
-    body("confirm-password").custom((value, { req }) => {
+    body("confirm_password").custom((value, { req }) => {
       if (value !== req.body.password) {
         throw new Error("Passwords do not match");
       }
       return true;
     }),
-
-    body("admin")
-      .isIn(["admin", "normal"])
-      .withMessage("Please select a valid account type"),
   ],
   async (req, res) => {
     try {
@@ -142,19 +143,16 @@ router.post(
       if (!errors.isEmpty()) {
         const errorMessages = errors.array().map((error) => error.msg);
         return res.render("register", {
-          error: errorMessages.join(". "),
+          errors: errorMessages,
           formData: req.body,
         });
       }
 
-      const {
-        "first-name": firstName,
-        "last-name": lastName,
-        username,
-        email,
-        password,
-        admin,
-      } = req.body;
+      const { first_name, last_name, username, email, password, admin_code } =
+        req.body;
+
+      const isAdmin = admin_code === process.env.ADMIN_SECRET_CODE;
+      const isMember = isAdmin; // Admins are always members
 
       const existingUser = await pool.query(
         "SELECT * FROM users WHERE username = $1 OR email = $2",
@@ -163,27 +161,34 @@ router.post(
 
       if (existingUser.rows.length > 0) {
         return res.render("register", {
-          error:
+          errors: [
             "Username or email already exists. Please choose different ones.",
-          formData: { firstName, lastName, username, email, admin },
+          ],
+          formData: req.body,
         });
       }
 
       const saltRounds = 10;
       const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-      const isAdmin = admin === "admin";
-
       const newUser = await pool.query(
-        "INSERT INTO users (first_name, last_name, username, email, password, is_admin) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, username, email",
-        [firstName, lastName, username, email, hashedPassword, isAdmin]
+        "INSERT INTO users (first_name, last_name, username, email, password, is_admin, is_member) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, username, email",
+        [
+          first_name,
+          last_name,
+          username,
+          email,
+          hashedPassword,
+          isAdmin,
+          isMember,
+        ]
       );
 
       res.redirect("/login?registered=true");
     } catch (error) {
       console.error("Registration error:", error);
       res.render("register", {
-        error: "An error occurred during registration. Please try again.",
+        errors: ["An error occurred during registration. Please try again."],
         formData: req.body,
       });
     }
@@ -192,17 +197,12 @@ router.post(
 
 router.post(
   "/become-member",
+  ensureLoggedIn,
   [
-    body("passcode")
+    body("secret_code")
       .trim()
       .isLength({ min: 1 })
-      .withMessage("Passcode can't be empty")
-      .custom((value) => {
-        if (value !== process.env.MEMBER_CODE) {
-          throw new Error("Invalid passcode");
-        }
-        return true;
-      }),
+      .withMessage("Passcode is required"),
   ],
   async (req, res) => {
     try {
@@ -273,18 +273,19 @@ router.post("/logout", (req, res, next) => {
 });
 
 router.post(
-  "/message",
+  "/create-message",
+  ensureLoggedIn,
   [
     body("title")
       .trim()
-      .isLength({ min: 1 })
-      .withMessage("Title can't be empty"),
-    body("content")
+      .isLength({ min: 1, max: 100 })
+      .withMessage("Title must be between 1 and 100 characters"),
+    body("text")
       .trim()
-      .isLength({ min: 1 })
-      .withMessage("Message content can't be empty"),
+      .isLength({ min: 1, max: 2000 })
+      .withMessage("Content must be between 1 and 2000 characters"),
   ],
-  async (req, res) => {
+  async (req, res, next) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).render("login", {
@@ -300,11 +301,11 @@ router.post(
         });
       }
 
-      const { title, content } = req.body;
+      const { title, text } = req.body;
 
       const result = await pool.query(
         "INSERT INTO messages (author_id, title, content) VALUES ($1, $2, $3) RETURNING *",
-        [req.user.id, title, content]
+        [req.user.id, title, text]
       );
 
       if (result.rows[0]) {
@@ -330,11 +331,8 @@ router.post(
     }
   }
 );
-router.get("/messages", async (req, res) => {
+router.get("/messages", ensureLoggedIn, async (req, res) => {
   try {
-    if (!req.isAuthenticated()) {
-      return res.redirect("/login");
-    }
     const result = await pool.query(`
       SELECT 
         m.id,
@@ -342,15 +340,25 @@ router.get("/messages", async (req, res) => {
         m.content,
         m.created_at,
         u.first_name,
-        u.last_name,
-        u.username,
-        u.is_member
+        u.last_name
       FROM messages m
       JOIN users u ON m.author_id = u.id
       ORDER BY m.created_at DESC
     `);
+
+    const messages = result.rows.map((row) => ({
+      _id: row.id,
+      title: row.title,
+      text: row.content,
+      timestamp: row.created_at,
+      user: {
+        first_name: row.first_name,
+        last_name: row.last_name,
+      },
+    }));
+
     return res.render("dashboard", {
-      messages: result.rows,
+      messages: messages,
       user: req.user,
     });
   } catch (error) {
@@ -362,4 +370,18 @@ router.get("/messages", async (req, res) => {
     });
   }
 });
+router.post("/delete-message/:id", ensureLoggedIn, async (req, res) => {
+  try {
+    if (!req.user.is_admin) {
+      return res.status(403).send("You are not authorized to delete messages.");
+    }
+    const messageId = req.params.id;
+    await pool.query("DELETE FROM messages WHERE id = $1", [messageId]);
+    res.redirect("/dashboard");
+  } catch (error) {
+    console.error("Error deleting message:", error);
+    res.redirect("/dashboard");
+  }
+});
+
 module.exports = router;

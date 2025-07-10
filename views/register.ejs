@@ -1,13 +1,12 @@
-<%- include('partials/header', { title: 'Register - Members Only' }) %>
+<%- include('partials/header', { title: 'Register' }) %>
 
 <div class="row justify-content-center">
-  <div class="col-lg-6 col-md-8">
-    <div class="card shadow-lg border-0">
-      <div class="card-body p-5">
+  <div class="col-md-8 col-lg-6">
+    <div class="card">
+      <div class="card-body p-4 p-md-5">
         <div class="text-center mb-4">
-          <i class="fas fa-user-plus fa-3x text-primary mb-3"></i>
-          <h2 class="fw-bold text-dark">Create Account</h2>
-          <p class="text-muted">Join our exclusive community</p>
+          <h2 class="fw-bold">Create an Account</h2>
+          <p class="text-muted">Join The Inner Circle today.</p>
         </div>
 
         <% if (typeof error !== 'undefined' && error) { %>
@@ -16,131 +15,112 @@
         </div>
         <% } %>
 
-        <form action="/auth/register" method="post">
+        <form action="/register" method="post">
           <div class="row">
-            <div class="col-md-6 mb-3">
-              <label for="first-name" class="form-label">First Name</label>
-              <input
-                name="first-name"
-                id="first-name"
-                type="text"
-                class="form-control"
-                placeholder="Enter your first name"
-                value="<%= typeof formData !== 'undefined' && formData.firstName ? formData.firstName : '' %>"
-                required
-              />
+            <div class="col-md-6">
+              <div class="form-floating mb-3">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="first_name"
+                  name="first_name"
+                  placeholder="First Name"
+                  value="<%= typeof formData !== 'undefined' && formData.firstName ? formData.firstName : '' %>"
+                  required
+                />
+                <label for="first_name">First Name</label>
+              </div>
             </div>
-            <div class="col-md-6 mb-3">
-              <label for="last-name" class="form-label">Last Name</label>
-              <input
-                name="last-name"
-                id="last-name"
-                type="text"
-                class="form-control"
-                placeholder="Enter your last name"
-                value="<%= typeof formData !== 'undefined' && formData.lastName ? formData.lastName : '' %>"
-                required
-              />
+            <div class="col-md-6">
+              <div class="form-floating mb-3">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="last_name"
+                  name="last_name"
+                  placeholder="Last Name"
+                  value="<%= typeof formData !== 'undefined' && formData.lastName ? formData.lastName : '' %>"
+                  required
+                />
+                <label for="last_name">Last Name</label>
+              </div>
             </div>
           </div>
-
-          <div class="mb-3">
-            <label for="username" class="form-label">Username</label>
+          <div class="form-floating mb-3">
             <input
-              name="username"
-              id="username"
               type="text"
               class="form-control"
-              placeholder="Choose a username"
+              id="username"
+              name="username"
+              placeholder="Username"
               value="<%= typeof formData !== 'undefined' && formData.username ? formData.username : '' %>"
               required
             />
+            <label for="username">Username</label>
           </div>
-
-          <div class="mb-3">
-            <label for="email" class="form-label">Email Address</label>
+          <div class="form-floating mb-3">
             <input
               type="email"
-              name="email"
-              id="email"
               class="form-control"
-              placeholder="Enter your email address"
+              id="email"
+              name="email"
+              placeholder="name@example.com"
               value="<%= typeof formData !== 'undefined' && formData.email ? formData.email : '' %>"
               required
             />
+            <label for="email">Email address</label>
           </div>
-
-          <div class="mb-3">
-            <label for="password" class="form-label">Password</label>
+          <div class="form-floating mb-3">
             <input
               type="password"
-              name="password"
+              class="form-control"
               id="password"
-              class="form-control"
-              placeholder="Create a strong password"
+              name="password"
+              placeholder="Password"
               minlength="6"
               required
             />
+            <label for="password">Password</label>
           </div>
-
-          <div class="mb-4">
-            <label for="confirm-password" class="form-label"
-              >Confirm Password</label
-            >
+          <div class="form-floating mb-3">
             <input
               type="password"
-              name="confirm-password"
-              id="confirm-password"
               class="form-control"
-              placeholder="Confirm your password"
+              id="confirm_password"
+              name="confirm_password"
+              placeholder="Confirm Password"
               minlength="6"
               required
             />
+            <label for="confirm_password">Confirm Password</label>
           </div>
 
-          <div class="mb-4">
-            <label class="form-label">Account Type</label>
-            <div class="d-flex gap-3">
-              <div class="form-check">
-                <input type="radio" name="admin" id="admin-yes"
-                class="form-check-input" value="admin" <% if (typeof formData
-                !== 'undefined' && formData.admin === 'admin') { %>checked<% }
-                %> />
-                <label class="form-check-label" for="admin-yes">
-                  <i class="fas fa-crown text-warning me-1"></i>Admin
-                </label>
-              </div>
-              <div class="form-check">
-                <input type="radio" name="admin" id="admin-no"
-                class="form-check-input" value="normal" <% if (typeof formData
-                === 'undefined' || formData.admin === 'normal' ||
-                !formData.admin) { %>checked<% } %> />
-                <label class="form-check-label" for="admin-no">
-                  <i class="fas fa-user text-primary me-1"></i>Regular Member
-                </label>
-              </div>
-            </div>
-            <div class="form-text text-muted">
-              <small
-                >Choose your account type. Admin accounts have additional
-                privileges.</small
-              >
+          <div class="form-floating mb-3">
+            <input
+              type="password"
+              class="form-control"
+              id="admin_code"
+              name="admin_code"
+              placeholder="Admin Code (Optional)"
+            />
+            <label for="admin_code">Admin Code (Optional)</label>
+            <div class="form-text">
+              If you have an admin code, enter it here to register as an
+              administrator.
             </div>
           </div>
 
-          <div class="d-grid mb-3">
+          <div class="d-grid mb-4">
             <button type="submit" class="btn btn-primary btn-lg">
-              <i class="fas fa-user-plus me-2"></i>Create Account
+              <i class="fas fa-user-plus me-2"></i>Register
             </button>
           </div>
-
-          <div class="text-center">
-            <p class="text-muted">
-              Already have an account?
-              <a href="/login" class="text-decoration-none">Sign in here</a>
-            </p>
-          </div>
         </form>
+        <div class="text-center mt-4">
+          <p class="text-muted">
+            Already have an account? <a href="/login">Login</a>
+          </p>
+        </div>
       </div>
     </div>
   </div>

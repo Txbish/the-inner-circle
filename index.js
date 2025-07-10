@@ -22,6 +22,7 @@ app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(express.static(path.join(__dirname, "public")));
 
 app.use(
   session({
@@ -54,6 +55,7 @@ function ensureLoggedIn(req, res, next) {
 
 // Routes
 app.use("/", authRoutes);
+
 app.get("/become-member", ensureLoggedIn, (req, res) => {
   res.render("become-member", { user: req.user });
 });
@@ -69,7 +71,6 @@ app.get("/create-message", ensureLoggedIn, (req, res) => {
 });
 
 app.get("/dashboard", ensureLoggedIn, (req, res) => {
-  // Redirect to the messages route which handles the dashboard rendering
   res.redirect("/messages");
 });
 
