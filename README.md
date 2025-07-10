@@ -9,7 +9,7 @@
     <a href="#"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="#">View Demo</a>
+    <a href="https://the-inner-circle.onrender.com/">View Demo</a>
     ·
     <a href="#">Report Bug</a>
     ·
