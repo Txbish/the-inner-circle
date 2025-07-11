@@ -198,34 +198,22 @@ router.post(
       .withMessage("Passcode is required"),
   ],
   async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.render("become-member", {
+        error: errors.array()[0].msg,
+        user: req.user,
+      });
+    }
+
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).render("login", {
-          error: "Please log in to become a member",
-        });
-      }
+      const { secret_code } = req.body;
 
-      // Handle validation errors
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
+      if (secret_code !== process.env.MEMBER_SECRET_CODE) {
         return res.render("become-member", {
-          error: errors.array()[0].msg,
-          formData: req.body,
+          error: "Incorrect passcode. Please try again.",
           user: req.user,
         });
-      }
-
-      if (req.user.is_member) {
-        return res.render("become-member", {
-          success: "You are already a member!",
-          user: req.user,
-        });
-      }
-
-      // Update membership status
-      if (req.body.secret_code !== process.env.MEMBER_CODE) {
-        req.flash("error", "The secret passcode is incorrect.");
-        return res.redirect("/become-member");
       }
 
       // Use Prisma to update the user's membership status
@@ -234,94 +222,21 @@ router.post(
         data: { is_member: true },
       });
 
-      // Update the user object for the session
-      req.user.is_member = true;
-      req.flash("successMessage", "Congratulations! You have become a member.");
-      res.redirect("/dashboard");
+      req.flash(
+        "successMessage",
+        "Congratulations! You are now a full member."
+      );
+      res.redirect("/messages");
     } catch (error) {
-      console.error("Error changing membership status:", error);
-      req.flash("error", "An error occurred. Please try again.");
-      res.redirect("/become-member");
-    }
-  }
-);
-
-router.post("/logout", (req, res, next) => {
-  req.logout((err) => {
-    if (err) {
-      return next(err);
-    }
-    req.session.destroy((err) => {
-      if (err) {
-        return next(err);
-      }
-      res.clearCookie("members_only_session");
-      res.redirect("/");
-    });
-  });
-});
-
-router.post(
-  "/create-message",
-  ensureLoggedIn,
-  [
-    body("title")
-      .trim()
-      .isLength({ min: 1, max: 100 })
-      .withMessage("Title must be between 1 and 100 characters"),
-    body("text")
-      .trim()
-      .isLength({ min: 1, max: 2000 })
-      .withMessage("Content must be between 1 and 2000 characters"),
-  ],
-  async (req, res, next) => {
-    try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).render("login", {
-          error: "Please log in to post a message",
-        });
-      }
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return res.render("create-message", {
-          error: errors.array()[0].msg,
-          formData: req.body,
-          user: req.user,
-        });
-      }
-
-      const { title, text } = req.body;
-
-      // Use Prisma to create a new message
-      const newMessage = await prisma.message.create({
-        data: {
-          title: title,
-          content: text,
-          author_id: req.user.id,
-        },
-      });
-
-      if (newMessage) {
-        req.flash("successMessage", "Message created successfully!");
-        return res.redirect("/messages");
-      } else {
-        return res.render("create-message", {
-          error: "Unable to create message",
-          formData: req.body,
-          user: req.user,
-        });
-      }
-    } catch (error) {
-      console.error("Create message error:", error);
-      return res.render("create-message", {
-        error:
-          "An error occurred while creating the message. Please try again.",
-        formData: req.body,
+      console.error("Membership update error:", error);
+      res.render("become-member", {
+        error: "An error occurred while updating your membership.",
         user: req.user,
       });
     }
   }
 );
+
 router.get("/messages", ensureLoggedIn, async (req, res) => {
   try {
     // Use Prisma to get all messages and include author details
@@ -339,7 +254,6 @@ router.get("/messages", ensureLoggedIn, async (req, res) => {
       },
     });
 
-    // Map to the structure expected by the view
     const messages = messagesFromDb.map((msg) => ({
       id: msg.id,
       title: msg.title,
@@ -352,6 +266,7 @@ router.get("/messages", ensureLoggedIn, async (req, res) => {
     return res.render("dashboard", {
       messages: messages,
       user: req.user,
+      successMessage: req.flash("successMessage"),
     });
   } catch (error) {
     console.error("Error fetching messages:", error);

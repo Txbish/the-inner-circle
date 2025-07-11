@@ -12,16 +12,29 @@
             </p>
           </div>
 
-          <% if (user.is_member) { %>
+          <% if (locals.error && locals.error.length > 0) { %>
+          <div
+            class="alert alert-danger alert-dismissible fade show"
+            role="alert"
+          >
+            <%= Array.isArray(error) ? error.join(', ') : error %>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="alert"
+              aria-label="Close"
+            ></button>
+          </div>
+          <% } %> <% if (user.is_member) { %>
           <div class="alert alert-success text-center" role="alert">
             <h4 class="alert-heading">
               <i class="fas fa-check-circle me-2"></i>You Are Already a Member!
             </h4>
             <p>You have full access to all community features.</p>
             <hr />
-            <a href="/dashboard" class="btn btn-primary"
-              ><i class="fas fa-tachometer-alt me-1"></i>Go to Dashboard</a
-            >
+            <a href="/messages" class="btn btn-primary">
+              <i class="fas fa-tachometer-alt me-1"></i>Go to Dashboard
+            </a>
           </div>
           <% } else { %>
           <form action="/become-member" method="post">
@@ -42,57 +55,12 @@
               </button>
             </div>
           </form>
-          <div class="container mt-5">
-            <div class="row justify-content-center">
-              <div class="col-md-6">
-                <div class="card shadow-sm">
-                  <div class="card-body">
-                    <h1 class="card-title text-center mb-4">Become a Member</h1>
-
-                    <% if (user.is_member) { %>
-                    <div class="alert alert-success text-center">
-                      <p class="mb-0">
-                        Welcome, valued member! You already have full access.
-                      </p>
-                      <a href="/dashboard" class="alert-link"
-                        >Go to Dashboard</a
-                      >
-                    </div>
-                    <% } else { %> <% if (locals.error) { %>
-                    <div class="alert alert-danger"><%= error %></div>
-                    <% } %> <% if (locals.successMessage) { %>
-                    <div class="alert alert-success"><%= successMessage %></div>
-                    <% } %>
-
-                    <form action="/become-member" method="POST">
-                      <div class="mb-3">
-                        <label for="secret_code" class="form-label"
-                          >Enter Secret Passcode</label
-                        >
-                        <input
-                          type="text"
-                          class="form-control"
-                          id="secret_code"
-                          name="secret_code"
-                          required
-                        />
-                      </div>
-                      <button type="submit" class="btn btn-primary w-100">
-                        Join the Inner Circle
-                      </button>
-                    </form>
-                    <hr />
-                    <div class="text-center">
-                      <p>Don't have the code?</p>
-                      <a href="/get-the-code" class="btn btn-outline-secondary"
-                        >Solve the Riddle</a
-                      >
-                    </div>
-                    <% } %>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <hr />
+          <div class="text-center">
+            <p>Don't have the code?</p>
+            <a href="/get-the-code" class="btn btn-outline-secondary">
+              Solve the Riddle to Get It
+            </a>
           </div>
           <% } %>
         </div>

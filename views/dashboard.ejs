@@ -66,7 +66,7 @@
           </div>
           <% if (user && user.is_admin) { %>
           <form
-            action="/delete-message/<%= message._id %>"
+            action="/delete-message/<%= message.id %>"
             method="post"
             class="mt-3"
           >

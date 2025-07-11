@@ -33,6 +33,7 @@ New users can sign up, but they have limited access. Only by providing a secret 
 - **✍️ Message Board**: Members can create and view detailed messages.
 - **👑 Admin Powers**: Admins can delete any message to keep the peace.
 - **✨ Flash Notifications**: Users receive contextual feedback for their actions.
+- **🧩 Riddle Game**: A fun riddle to help non-members discover the secret code.
 
 ---
 
@@ -50,6 +51,7 @@ This project is built with a modern, robust stack:
 | **Passport.js**         | Simple, unobtrusive authentication for Node.js.                                 |
 | **Bootstrap 5**         | A popular CSS framework for responsive, mobile-first front-end web development. |
 | **`express-session`**   | Session middleware for managing user sessions.                                  |
+| **`@quixo3/prisma-session-store`** | A Prisma-based session store for Express.                               |
 | **`connect-flash`**     | Middleware for displaying flash messages.                                       |
 | **`express-validator`** | Middleware for validating and sanitizing user input.                            |
 | **`bcryptjs`**          | A library for hashing passwords securely.                                       |
@@ -78,7 +80,7 @@ To get a local copy up and running, follow these simple steps.
     npm install
     ```
 3.  **Set up your environment variables**
-    Rename `.env.example` to `.env`. The most important variable is `DATABASE_URL`, which tells Prisma how to connect to your local PostgreSQL database. Update it with your credentials.
+    Rename `.env.example` to `.env`. The most important variable is `DATABASE_URL`, which tells Prisma how to connect to your local PostgreSQL database. Update it with your credentials. You'll also need to set `MEMBER_SECRET_CODE` and `ADMIN_SECRET_CODE`.
 
 4.  **Set up the database with Prisma**
     Instead of running SQL manually, you'll use Prisma Migrate. This command reads your `prisma/schema.prisma` file and automatically creates the necessary tables in your database.
@@ -92,6 +94,26 @@ To get a local copy up and running, follow these simple steps.
     npm start
     ```
     The application will be available at `http://localhost:3000`.
+
+---
+
+## 🎮 How to Become a Member
+
+Don't have the secret code? No problem! Visit the "Become a Member" page and click the "Solve the Riddle" button. A short, fun game will give you the code you need to unlock full membership.
+
+---
+
+## 🚢 Deployment
+
+This application is designed for easy deployment on platforms like Render.
+
+1.  **Connect your Git repository** to Render.
+2.  **Create a new "Web Service"** and point it to your repository.
+3.  **Set the Build Command** to `npm install && npx prisma generate`. The `prisma generate` step is crucial to ensure the Prisma Client is created in the production environment.
+4.  **Set the Start Command** to `npm start`.
+5.  **Add your environment variables** (`DATABASE_URL`, `SESSION_SECRET`, etc.) in the Render dashboard.
+
+Render will automatically deploy your application whenever you push changes to your main branch.
 
 ---
 
