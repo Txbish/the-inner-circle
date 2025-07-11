@@ -1,16 +1,15 @@
-const { Pool } = require("pg");
-const isProduction = process.env.NODE_ENV === "production";
+const { PrismaClient } = require("@prisma/client");
 
-const connectionString = process.env.DATABASE_URL;
+const globalForPrisma = global;
 
-const pool = new Pool({
-  connectionString: isProduction ? connectionString : null,
-  ssl: isProduction ? { rejectUnauthorized: false } : false,
-  user: isProduction ? undefined : process.env.DB_USER,
-  password: isProduction ? undefined : process.env.DB_PASSWORD,
-  host: isProduction ? undefined : process.env.DB_HOST,
-  port: isProduction ? undefined : process.env.DB_PORT,
-  database: isProduction ? undefined : process.env.DB_DATABASE,
-});
+const prisma =
+  globalForPrisma.prisma ||
+  new PrismaClient({
+    log: ["info"],
+  });
 
-module.exports = pool;
+if (process.env.NODE_ENV !== "production") {
+  globalForPrisma.prisma = prisma;
+}
+
+module.exports = prisma;

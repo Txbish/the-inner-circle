@@ -124,6 +124,6 @@ app.listen(PORT, () => {
           }
         })
         .catch((err) => console.error("Error during self-ping:", err));
-    }, 13 * 60 * 1000); // 13 minutes
+    }, 1 * 60 * 1000); // 13 minutes
   }
 });

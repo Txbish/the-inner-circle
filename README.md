@@ -44,6 +44,7 @@ This project is built with a modern, robust stack:
 | :---------------------- | :------------------------------------------------------------------------------ |
 | **Node.js**             | The core runtime environment.                                                   |
 | **Express.js**          | A fast, unopinionated, minimalist web framework for Node.js.                    |
+| **Prisma**              | A next-generation ORM for Node.js and TypeScript database access.               |
 | **PostgreSQL**          | A powerful, open-source object-relational database system.                      |
 | **EJS**                 | Embedded JavaScript templating for dynamic HTML generation.                     |
 | **Passport.js**         | Simple, unobtrusive authentication for Node.js.                                 |
@@ -70,17 +71,21 @@ To get a local copy up and running, follow these simple steps.
 
 1.  **Clone the repo**
     ```sh
-    git clone https://github.com/txbish/the-inner-circle.git
+    git clone https://github.com/your_username/the-inner-circle.git
     ```
 2.  **Install NPM packages**
     ```sh
     npm install
     ```
 3.  **Set up your environment variables**
-    Rename `.env.example` to `.env` and update the values with your actual database credentials and secrets.
+    Rename `.env.example` to `.env`. The most important variable is `DATABASE_URL`, which tells Prisma how to connect to your local PostgreSQL database. Update it with your credentials.
 
-4.  **Set up the database**
-    Connect to your PostgreSQL instance and run the queries in `database.sql` to create the necessary tables. (You will need to create this file with the table schemas).
+4.  **Set up the database with Prisma**
+    Instead of running SQL manually, you'll use Prisma Migrate. This command reads your `prisma/schema.prisma` file and automatically creates the necessary tables in your database.
+
+    ```sh
+    npx prisma migrate dev --name init
+    ```
 
 5.  **Run the application**
     ```sh

@@ -41,3 +41,5 @@ coverage/
 .env.development
 .env.test
 .env.*.local
+
+/generated/prisma

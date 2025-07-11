@@ -2,7 +2,7 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const { body, validationResult } = require("express-validator");
 const router = express.Router();
-const pool = require("../db.js");
+const prisma = require("../db.js");
 const passport = require("passport");
 const LocalPassport = require("passport-local");
 
@@ -14,12 +14,11 @@ function ensureLoggedIn(req, res, next) {
 passport.serializeUser((user, done) => done(null, user.id));
 passport.deserializeUser(async (id, done) => {
   try {
-    const result = await pool.query("Select * from users where id =$1", [id]);
-    if (result.rows[0]) {
-      done(null, result.rows[0]);
-    } else {
-      done(null, false);
-    }
+    // Use Prisma to find the user by ID
+    const user = await prisma.user.findUnique({
+      where: { id: parseInt(id, 10) },
+    });
+    done(null, user);
   } catch (error) {
     done(error);
   }
@@ -27,14 +26,16 @@ passport.deserializeUser(async (id, done) => {
 passport.use(
   new LocalPassport.Strategy(async (username, password, done) => {
     try {
-      const result = await pool.query(
-        "Select * from users where username = $1 OR email = $1",
-        [username]
-      );
-      if (!result.rows[0]) {
+      // Use Prisma to find a user by username or email
+      const user = await prisma.user.findFirst({
+        where: {
+          OR: [{ username: username }, { email: username }],
+        },
+      });
+
+      if (!user) {
         return done(null, false, { message: "User not found" });
       }
-      const user = result.rows[0];
       const matched = await bcrypt.compare(password, user.password);
       if (!matched) {
         return done(null, false, { message: "Password does not match" });
@@ -140,12 +141,12 @@ router.post(
       const isAdmin = admin_code === process.env.ADMIN_SECRET_CODE;
       const isMember = isAdmin; // Admins are always members
 
-      const existingUser = await pool.query(
-        "SELECT * FROM users WHERE username = $1 OR email = $2",
-        [username, email]
-      );
+      // Use Prisma to check if user exists
+      const existingUser = await prisma.user.findFirst({
+        where: { OR: [{ username: username }, { email: email }] },
+      });
 
-      if (existingUser.rows.length > 0) {
+      if (existingUser) {
         req.flash(
           "error",
           "Username or email already exists. Please choose different ones."
@@ -157,18 +158,18 @@ router.post(
       const saltRounds = 10;
       const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-      const newUser = await pool.query(
-        "INSERT INTO users (first_name, last_name, username, email, password, is_admin, is_member) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, username, email",
-        [
+      // Use Prisma to create a new user
+      await prisma.user.create({
+        data: {
           first_name,
           last_name,
           username,
           email,
-          hashedPassword,
-          isAdmin,
-          isMember,
-        ]
-      );
+          password: hashedPassword,
+          is_admin: isAdmin,
+          is_member: isMember,
+        },
+      });
 
       req.flash(
         "success",
@@ -227,14 +228,11 @@ router.post(
         return res.redirect("/become-member");
       }
 
-      const { rowCount } = await pool.query(
-        "UPDATE users SET is_member = true WHERE id = $1",
-        [req.user.id]
-      );
-
-      if (rowCount === 0) {
-        throw new Error("User not found or could not update");
-      }
+      // Use Prisma to update the user's membership status
+      await prisma.user.update({
+        where: { id: req.user.id },
+        data: { is_member: true },
+      });
 
       // Update the user object for the session
       req.user.is_member = true;
@@ -294,12 +292,16 @@ router.post(
 
       const { title, text } = req.body;
 
-      const result = await pool.query(
-        "INSERT INTO messages (author_id, title, content) VALUES ($1, $2, $3) RETURNING *",
-        [req.user.id, title, text]
-      );
+      // Use Prisma to create a new message
+      const newMessage = await prisma.message.create({
+        data: {
+          title: title,
+          content: text,
+          author_id: req.user.id,
+        },
+      });
 
-      if (result.rows[0]) {
+      if (newMessage) {
         req.flash("successMessage", "Message created successfully!");
         return res.redirect("/messages");
       } else {
@@ -322,28 +324,29 @@ router.post(
 );
 router.get("/messages", ensureLoggedIn, async (req, res) => {
   try {
-    const result = await pool.query(`
-      SELECT 
-        m.id,
-        m.title,
-        m.content,
-        m.created_at,
-        u.first_name,
-        u.last_name
-      FROM messages m
-      JOIN users u ON m.author_id = u.id
-      ORDER BY m.created_at DESC
-    `);
-
-    const messages = result.rows.map((row) => ({
-      _id: row.id,
-      title: row.title,
-      text: row.content,
-      timestamp: row.created_at,
-      user: {
-        first_name: row.first_name,
-        last_name: row.last_name,
+    // Use Prisma to get all messages and include author details
+    const messagesFromDb = await prisma.message.findMany({
+      include: {
+        author: {
+          select: {
+            first_name: true,
+            last_name: true,
+          },
+        },
       },
+      orderBy: {
+        created_at: "desc",
+      },
+    });
+
+    // Map to the structure expected by the view
+    const messages = messagesFromDb.map((msg) => ({
+      id: msg.id,
+      title: msg.title,
+      text: msg.content,
+      timestamp: msg.created_at,
+      user: msg.author,
+      is_admin: req.user.is_admin,
     }));
 
     return res.render("dashboard", {
@@ -364,8 +367,9 @@ router.post("/delete-message/:id", ensureLoggedIn, async (req, res) => {
     if (!req.user.is_admin) {
       return res.status(403).send("You are not authorized to delete messages.");
     }
-    const messageId = req.params.id;
-    await pool.query("DELETE FROM messages WHERE id = $1", [messageId]);
+    const messageId = parseInt(req.params.id, 10);
+    // Use Prisma to delete the message
+    await prisma.message.delete({ where: { id: messageId } });
     req.flash("successMessage", "Message deleted successfully.");
     res.redirect("/messages");
   } catch (error) {
