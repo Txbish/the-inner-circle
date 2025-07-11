@@ -78,6 +78,13 @@ app.get("/create-message", ensureLoggedIn, (req, res) => {
   res.render("create-message", { user: req.user });
 });
 
+app.get("/get-the-code", (req, res) => {
+  res.render("get-the-code", {
+    user: req.user,
+    memberCode: process.env.MEMBER_CODE,
+  });
+});
+
 app.get("/dashboard", ensureLoggedIn, (req, res) => {
   res.redirect("/messages");
 });

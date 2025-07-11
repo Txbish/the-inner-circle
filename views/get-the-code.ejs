@@ -1,0 +1,78 @@
+<%- include('partials/header') %>
+
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 text-center">
+      <h1 class="mb-4">The Gatekeeper's Riddle</h1>
+      <p class="lead">
+        Answer the riddle to prove your worth and receive the secret code.
+      </p>
+
+      <div id="riddle-container" class="card p-4 shadow-sm">
+        <p class="h5" id="riddle-text">
+          I have cities, but no houses. I have mountains, but no trees. I have
+          water, but no fish. What am I?
+        </p>
+        <div class="input-group mt-3">
+          <input
+            type="text"
+            id="answer-input"
+            class="form-control"
+            placeholder="Your answer..."
+          />
+          <button id="submit-answer" class="btn btn-primary">Submit</button>
+        </div>
+        <div id="feedback" class="mt-3"></div>
+      </div>
+
+      <div
+        id="success-container"
+        class="card p-4 shadow-sm text-center"
+        style="display: none"
+      >
+        <h2 class="text-success">You have solved the riddle!</h2>
+        <p>The secret code to become a member is:</p>
+        <p class="display-4 font-monospace bg-light p-3 rounded">
+          <%= memberCode %>
+        </p>
+        <a href="/become-member" class="btn btn-success mt-3">Use the Code</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const submitButton = document.getElementById("submit-answer");
+    const answerInput = document.getElementById("answer-input");
+    const feedbackDiv = document.getElementById("feedback");
+    const riddleContainer = document.getElementById("riddle-container");
+    const successContainer = document.getElementById("success-container");
+
+    const correctAnswer = "a map";
+
+    submitButton.addEventListener("click", () => {
+      const userAnswer = answerInput.value.trim().toLowerCase();
+
+      if (userAnswer === correctAnswer) {
+        feedbackDiv.innerHTML = "";
+        riddleContainer.style.display = "none";
+        successContainer.style.display = "block";
+      } else {
+        feedbackDiv.innerHTML =
+          '<p class="text-danger">That is not correct. Ponder the question and try again.</p>';
+        answerInput.value = "";
+        answerInput.focus();
+      }
+    });
+
+    // Allow pressing Enter to submit
+    answerInput.addEventListener("keyup", (event) => {
+      if (event.key === "Enter") {
+        submitButton.click();
+      }
+    });
+  });
+</script>
+
+<%- include('partials/footer') %>
